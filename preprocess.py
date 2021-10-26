@@ -16,14 +16,14 @@ from sklearn import metrics
 # y_pred = ["a", "b", "c", "a", "b"]
 # Actual values
 # y_act = ["a", "b", "c", "c", "a"]
-y_pred = [0,1,0,1,1,1]
-y_act = [0,1,1,0,0,1]
+# y_pred = [0,1,0,1,1,1]
+# y_act = [0,1,1,0,0,1]
 # Printing the confusion matrix
 # The columns will show the instances predicted for each label,
 # and the rows will show the actual number of instances for each label.
-print(metrics.confusion_matrix(y_act, y_pred, labels=[0, 1]))
+# print(metrics.confusion_matrix(y_act, y_pred, labels=[0, 1]))
 # Printing the precision and recall, among other metrics
-print(metrics.classification_report(y_act, y_pred, labels=[0, 1]))
+# print(metrics.classification_report(y_act, y_pred, labels=[0, 1]))
 
 np.random.seed(500)
 
@@ -39,12 +39,12 @@ np.random.seed(500)
 
 c1 = pd.read_csv(r"/Users/yangzhang/Downloads/jigsawCorpusNormal/train-toxic-var.csv")
 
-Corpus = c1[:1000]
+Corpus = c1
 
 text = Corpus["comment_text"]
 labels = Corpus["Toxic-or-not"]
 
-print(Corpus)
+# print(Corpus)
 
 # Step - a : Remove blank rows if any.
 text.dropna(inplace=True)
@@ -73,29 +73,10 @@ for index,entry in enumerate(text):
     # The final processed set of words for each iteration will be stored in 'text_final'
     Corpus.loc[index,'text_final'] = str(Final_words)
 
-Train_X, Test_X, Train_Y, Test_Y = model_selection.train_test_split(Corpus['text_final'], labels,test_size=0.3)
+compression_opts = dict(method='zip',
+                        archive_name='out.csv')  
 
-print(Train_X)
-
-Encoder = LabelEncoder()
-Train_Y = Encoder.fit_transform(Train_Y)
-Test_Y = Encoder.fit_transform(Test_Y)
-
-
-Tfidf_vect = TfidfVectorizer(max_features=5000)
-Tfidf_vect.fit(Corpus['text_final'])
-Train_X_Tfidf = Tfidf_vect.transform(Train_X)
-Test_X_Tfidf = Tfidf_vect.transform(Test_X)
-
-print(Tfidf_vect.vocabulary_)
-
-print(Train_X_Tfidf)
-
-# fit the training dataset on the NB classifier
-Naive = naive_bayes.MultinomialNB()
-Naive.fit(Train_X_Tfidf,Train_Y)
-# predict the labels on validation dataset
-predictions_NB = Naive.predict(Test_X_Tfidf)
-# Use accuracy_score function to get the accuracy
-
-print("Naive Bayes Accuracy Score -> ",accuracy_score(predictions_NB, Test_Y)*100)
+print("starting save")
+Corpus.to_csv('out.zip', index=False,
+          compression=compression_opts)
+print("done")
